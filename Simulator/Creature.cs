@@ -1,6 +1,6 @@
 ﻿namespace Simulator;
 
-public class Creature
+public abstract class Creature
 {
     private string name = "Unknown";
     public string Name
@@ -53,7 +53,8 @@ public class Creature
         Level = level;
     }
     public string Info => $"{Name} [{Level}]";
-    public void SayHi() => Console.WriteLine($"Hi, I'm {Name}, my level is {Level}!");
+    public abstract void SayHi();
+    public abstract int Power { get; }
     public void Upgrade()
     {
         if (level < 10)
@@ -84,4 +85,5 @@ public class Creature
         var parsedDirections = DirectionParser.Parse(directions);
         Go(parsedDirections);
     }
+
 }

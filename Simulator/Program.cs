@@ -40,4 +40,5 @@ internal class Program
             Console.WriteLine($"{creature.Name,-15}: {creature.Power}");
         }
     }
+
 }

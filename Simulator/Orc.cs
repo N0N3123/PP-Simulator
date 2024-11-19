@@ -18,9 +18,11 @@ public class Orc : Creature
         Rage = rage;
     }
 
-    public override void SayHi()
+    public override string Greeting()
     {
-        Console.WriteLine($"Hi, I'm {Name}, an Orc at level {Level} with rage {Rage}!");
+
+        return $"Hi, I'm {Name}, my level is {Level}, my rage is {Rage}";
+
     }
 
     public void Hunt()
@@ -29,11 +31,6 @@ public class Orc : Creature
         if (huntCount % 2 == 0 && rage < 10)
         {
             rage++;
-            Console.WriteLine($"{Name}'s rage increased to {Rage}!");
-        }
-        else
-        {
-            Console.WriteLine($"{Name} goes on a hunt.");
         }
     }
 

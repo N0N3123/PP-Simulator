@@ -46,4 +46,26 @@ public class DirectionParserTests
         // Assert
         Assert.Equal(expected, result);
     }
+
+    [Fact]
+    public void Parse_ShouldReturnEmptyForEmptyString()
+    {
+        // Arrange
+        string input = "";
+        // Act
+        var result = DirectionParser.Parse(input);
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public void Parse_ShouldHandleSingleValidCharacter()
+    {
+        // Arrange
+        string input = "U";
+        // Act
+        var result = DirectionParser.Parse(input);
+        // Assert
+        Assert.Equal(new[] { Direction.Up }, result);
+    }
 }

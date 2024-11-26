@@ -32,7 +32,7 @@ public abstract class Creature
         Level = level >= 1 ? level : 1;
     }
 
-    public string Greeting() => $"Hi, I'm {Name}, my level is {Level}.";
+    public abstract string Greeting();
     public int Upgrade() => level < 10 ? ++level : level;
     public void Go(Direction direction)
     {

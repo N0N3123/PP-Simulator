@@ -16,7 +16,7 @@ public abstract class Map
     /// <returns></returns>
     public virtual bool Exist(Point p)
     {
-        return boundaries.contains(p);
+        return boundaries.Contains(p);
     }
 
 

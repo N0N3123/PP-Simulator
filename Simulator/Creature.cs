@@ -34,22 +34,17 @@ public abstract class Creature
 
     public string Greeting() => $"Hi, I'm {Name}, my level is {Level}.";
     public int Upgrade() => level < 10 ? ++level : level;
-    public string Go(Direction direction) => $"{direction.ToString().ToLower()}"; //out
-    public string[] Go(Direction[] directions)
+    public void Go(Direction direction)
     {
-        //Map.Next()
-        //Map.Next() == Position -> bez ruchu
+        if (Map == null)
+            return; // Jeśli stwór nie ma mapy, nic nie robimy.
 
-        // Map.Move() -> Remove w punkcie 1, Add w punkcie 2
-        var result = new string[directions.Length];
-        for (int i = 0; i < directions.Length; i++)
-        {
-            result[i] = Go(directions[i]);
-        }
-        return result;
+        Point nextPosition = Map.Next(Position, direction);
+        Map.Move(this, Position, nextPosition); // Przemieszczanie stworów
+        Position = nextPosition;
     }
 
-    public string[] Go(string directionSeq) => Go(DirectionParser.Parse(directionSeq)); //out
+
     public abstract string Info { get; }
     public override string ToString() => $"{GetType().Name.ToUpper()}: {Info}";
 

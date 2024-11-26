@@ -19,7 +19,16 @@ public class Validator
         }
         else if (value.Length > max)
         {
-            value = value.Substring(0, max).Trim();
+            value = value.Substring(0, max);
+        }
+        if (!char.IsUpper(value[0]))
+        {
+            value = char.ToUpper(value[0]) + value.Substring(1);
+        }
+        value = value.Trim();
+        if (value.Length < min)
+        {
+            value = value.PadRight(min, placeholder);
         }
         return value;
     }

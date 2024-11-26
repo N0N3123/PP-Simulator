@@ -4,38 +4,32 @@ namespace TestSimulator;
 public class DirectionParserTests
 {
     [Fact]
-    public void Parse_ShouldParseDirectionsCorrectly()
+    public void Parse_ShouldParseMixedCaseDirectionsCorrectly()
     {
         // Arrange
-        string input = "URDL";
+        string input = "uRdL";
         // Act
         var result = DirectionParser.Parse(input);
         // Assert
-        Assert.Equal([Direction.Up, Direction.Right,
-            Direction.Down, Direction.Left],
-            result
-        );
+        Assert.Equal(new[] { Direction.Up, Direction.Right, Direction.Down, Direction.Left }, result);
     }
 
     [Fact]
-    public void Parse_ShouldHandleLowercaseLetters()
+    public void Parse_ShouldHandleInvalidAndValidCharacters()
     {
         // Arrange
-        string input = "urdl";
+        string input = "U!R@D#L$";
         // Act
         var result = DirectionParser.Parse(input);
         // Assert
-        Assert.Equal([Direction.Up, Direction.Right,
-            Direction.Down, Direction.Left],
-            result
-        );
+        Assert.Equal(new[] { Direction.Up, Direction.Right, Direction.Down, Direction.Left }, result);
     }
 
     [Fact]
-    public void Parse_ShouldReturnEmptyArrayForEmptyString()
+    public void Parse_ShouldReturnEmptyForWhitespace()
     {
         // Arrange
-        string input = "";
+        string input = "    ";
         // Act
         var result = DirectionParser.Parse(input);
         // Assert
@@ -43,19 +37,12 @@ public class DirectionParserTests
     }
 
     [Theory]
-    [InlineData("urdlx", new[] { Direction.Up, Direction.Right,
-        Direction.Down, Direction.Left })]
-    [InlineData("xxxdR lyyLTyu", new[] { Direction.Down,
-         Direction.Right, Direction.Left, Direction.Left,
-         Direction.Up })]
-
-    public void Parse_ShouldIgnoreInvalidCharacters(string s,
-        Direction[] expected)
+    [InlineData("URDLXZZ", new[] { Direction.Up, Direction.Right, Direction.Down, Direction.Left })]
+    [InlineData("xxxdr lYYLtYuZ", new[] { Direction.Down, Direction.Right, Direction.Left, Direction.Left, Direction.Up })]
+    public void Parse_ShouldIgnoreUnknownCharacters(string input, Direction[] expected)
     {
-        // Arrange 
-        // use [Theory] [InlineData] to check multiple sets of data
         // Act
-        var result = DirectionParser.Parse(s);
+        var result = DirectionParser.Parse(input);
         // Assert
         Assert.Equal(expected, result);
     }

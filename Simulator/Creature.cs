@@ -24,7 +24,11 @@ public abstract class Creature
     }
     public abstract int Power { get; }
 
-    public void InitMapAndPosition(Map map, Point position) { }
+    public void InitMapAndPosition(Map map, Point position)
+    {
+        Map = map;
+        Position = position;
+    }
     public Creature() { }
     public Creature(string name, int level = 1)
     {
@@ -32,7 +36,7 @@ public abstract class Creature
         Level = level >= 1 ? level : 1;
     }
 
-    public abstract string Greeting();
+    public string Greeting() => $"Hi, I'm {Name}, my level is {Level}.";
     public int Upgrade() => level < 10 ? ++level : level;
     public void Go(Direction direction)
     {

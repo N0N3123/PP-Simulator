@@ -4,10 +4,6 @@ namespace Simulator;
 
 public class Simulation
 {
-    private int _currentMoveIndex = 0;
-    private int _currentCreatureIndex = 0;
-    private List<Direction> _parsedMoves;
-
     /// <summary>
     /// Simulation's map.
     /// </summary>
@@ -24,82 +20,143 @@ public class Simulation
     public List<Point> Positions { get; }
 
     /// <summary>
-    /// Cyclic list of creatures moves. 
-    /// Bad moves are ignored - use DirectionParser.
-    /// First move is for first creature, second for second and so on.
-    /// When all creatures make moves, 
-    /// next move is again for first creature and so on.
+    /// Cyclic list of creatures' moves.
     /// </summary>
-    public string Moves { get; }
+    public string Moves { get; private set; }
 
     /// <summary>
     /// Has all moves been done?
     /// </summary>
     public bool Finished { get; private set; } = false;
 
-    /// <summary>
-    /// Creature which will be moving current turn.
-    /// </summary>
-    public Creature CurrentCreature => Creatures[_currentCreatureIndex];
+    private int _currentMoveIndex = 0;
 
     /// <summary>
-    /// Lowercase name of direction which will be used in current turn.
+    /// Creature which will be moving in the current turn.
     /// </summary>
-    public string CurrentMoveName => _parsedMoves[_currentMoveIndex].ToString().ToLower();
+    public Creature CurrentCreature => Creatures[_currentMoveIndex % Creatures.Count];
+
+    /// <summary>
+    /// Lowercase name of the direction which will be used in the current turn.
+    /// </summary>
+    public string CurrentMoveName => Moves[_currentMoveIndex].ToString().ToLower();
 
     /// <summary>
     /// Simulation constructor.
-    /// Throw errors:
-    /// if creatures' list is empty,
-    /// if number of creatures differs from 
-    /// number of starting positions.
+    /// Validates input and initializes the simulation.
     /// </summary>
     public Simulation(Map map, List<Creature> creatures, List<Point> positions, string moves)
     {
-        if (creatures == null || creatures.Count == 0)
-            throw new ArgumentException("Creatures list cannot be empty.");
-        if (creatures.Count != positions.Count)
-            throw new ArgumentException("Number of creatures must match number of starting positions.");
+        ValidateInput(map, creatures, positions, moves);
 
         Map = map;
         Creatures = creatures;
         Positions = positions;
         Moves = moves;
-        _parsedMoves = DirectionParser.Parse(moves);
 
-        for (int i = 0; i < creatures.Count; i++)
-        {
-            creatures[i].InitMapAndPosition(map, positions[i]);
-        }
+        InitializeCreatures();
     }
 
     /// <summary>
-    /// Makes one move of current creature in current direction.
-    /// Throw error if simulation is finished.
+    /// Makes one move of the current creature in the current direction.
+    /// Throws an error if the simulation is finished.
     /// </summary>
     public void Turn()
     {
         if (Finished)
-            throw new InvalidOperationException("Simulation is finished.");
-
-        var currentDirection = _parsedMoves[_currentMoveIndex];
-        var currentCreature = CurrentCreature;
-        var currentPosition = currentCreature.Position;
-        var nextPosition = Map.Next(currentPosition, currentDirection);
-
-        if (Map.Exist(nextPosition))
         {
-            Map.Move(currentCreature, currentPosition, nextPosition);
-            // Użycie metody Go do aktualizacji pozycji stworzenia
-            currentCreature.Go(currentDirection);
+            throw new InvalidOperationException("The simulation is already finished.");
         }
 
-        _currentMoveIndex = (_currentMoveIndex + 1) % _parsedMoves.Count;
-        _currentCreatureIndex = (_currentCreatureIndex + 1) % Creatures.Count;
-
-        if (_currentMoveIndex == 0 && _currentCreatureIndex == 0)
+        if (Moves.Length == 0)
         {
-            Finished = true;
+            FinishSimulation();
+            return;
         }
+
+        ProcessCurrentMove();
+        AdvanceToNextMove();
+
+        if (_currentMoveIndex >= Moves.Length)
+        {
+            FinishSimulation();
+        }
+    }
+
+    /// <summary>
+    /// Validates the input parameters for the simulation.
+    /// </summary>
+    private void ValidateInput(Map map, List<Creature> creatures, List<Point> positions, string moves)
+    {
+        if (creatures == null || creatures.Count == 0)
+        {
+            throw new ArgumentException("List of creatures cannot be empty.");
+        }
+
+        if (creatures.Count != positions.Count)
+        {
+            throw new ArgumentException("Number of creatures must match the number of starting positions.");
+        }
+
+        if (map == null)
+        {
+            throw new ArgumentNullException(nameof(map));
+        }
+
+        if (string.IsNullOrWhiteSpace(moves))
+        {
+            throw new ArgumentNullException(nameof(moves));
+        }
+    }
+
+    /// <summary>
+    /// Initializes creatures by setting their starting positions and adding them to the map.
+    /// </summary>
+    private void InitializeCreatures()
+    {
+        for (int i = 0; i < Creatures.Count; i++)
+        {
+            var creature = Creatures[i];
+            var position = Positions[i];
+
+            if (!Map.Exist(position))
+            {
+                throw new ArgumentException($"Position {position} is outside the bounds of the map.");
+            }
+
+            creature.InitMapAndPosition(Map, position);
+            Map.Add(creature, position);
+        }
+    }
+
+    /// <summary>
+    /// Processes the current move for the current creature.
+    /// </summary>
+    private void ProcessCurrentMove()
+    {
+        char currentMoveChar = Moves[_currentMoveIndex];
+        var directions = DirectionParser.Parse(currentMoveChar.ToString());
+
+        if (directions != null && directions.Count > 0)
+        {
+            var direction = directions[0];
+            CurrentCreature.Go(direction);
+        }
+    }
+
+    /// <summary>
+    /// Advances to the next move and updates the current move index.
+    /// </summary>
+    private void AdvanceToNextMove()
+    {
+        _currentMoveIndex++;
+    }
+
+    /// <summary>
+    /// Marks the simulation as finished.
+    /// </summary>
+    private void FinishSimulation()
+    {
+        Finished = true;
     }
 }

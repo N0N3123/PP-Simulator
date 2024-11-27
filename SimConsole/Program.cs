@@ -10,7 +10,7 @@ class Program
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
         SmallSquareMap map = new(7);
-        List<Creature> creatures = new() { new Orc("DisStream"), new Elf("Legolas") };
+        List<IMappable> creatures = new() { new Orc("DisStream"), new Elf("Legolas") };
         List<Point> points = new() { new(2, 1), new(1, 2) };
         string moves = "urrlududrlurd";
 
@@ -24,7 +24,9 @@ class Program
 
             Console.WriteLine("\nPress any key to make a move...");
             Console.ReadKey(true);
-            Console.Write($"{simulation.CurrentCreature.Info} {simulation.CurrentCreature.Position} goes {simulation.CurrentMoveName}\n");
+            Console.Write($"Mappable goes {simulation.CurrentMoveName}\n");
+
+
             simulation.Turn();
 
         }

@@ -10,17 +10,17 @@ public class Simulation
     public Map Map { get; }
 
     /// <summary>
-    /// Creatures moving on the map.
+    /// IMappables moving on the map.
     /// </summary>
-    public List<Creature> Creatures { get; }
+    public List<IMappable> IMappables { get; }
 
     /// <summary>
-    /// Starting positions of creatures.
+    /// Starting positions of mappables.
     /// </summary>
     public List<Point> Positions { get; }
 
     /// <summary>
-    /// Cyclic list of creatures' moves.
+    /// Cyclic list of mappables' moves.
     /// </summary>
     public string Moves { get; private set; }
 
@@ -32,9 +32,9 @@ public class Simulation
     private int _currentMoveIndex = 0;
 
     /// <summary>
-    /// Creature which will be moving in the current turn.
+    /// IMappable which will be moving in the current turn.
     /// </summary>
-    public Creature CurrentCreature => Creatures[_currentMoveIndex % Creatures.Count];
+    public IMappable CurrentIMappable => IMappables[_currentMoveIndex % IMappables.Count];
 
     /// <summary>
     /// Lowercase name of the direction which will be used in the current turn.
@@ -45,20 +45,20 @@ public class Simulation
     /// Simulation constructor.
     /// Validates input and initializes the simulation.
     /// </summary>
-    public Simulation(Map map, List<Creature> creatures, List<Point> positions, string moves)
+    public Simulation(Map map, List<IMappable> mappables, List<Point> positions, string moves)
     {
-        ValidateInput(map, creatures, positions, moves);
+        ValidateInput(map, mappables, positions, moves);
 
         Map = map;
-        Creatures = creatures;
+        IMappables = mappables;
         Positions = positions;
         Moves = moves;
 
-        InitializeCreatures();
+        InitializeIMappables();
     }
 
     /// <summary>
-    /// Makes one move of the current creature in the current direction.
+    /// Makes one move of the current mappable in the current direction.
     /// Throws an error if the simulation is finished.
     /// </summary>
     public void Turn()
@@ -86,16 +86,16 @@ public class Simulation
     /// <summary>
     /// Validates the input parameters for the simulation.
     /// </summary>
-    private void ValidateInput(Map map, List<Creature> creatures, List<Point> positions, string moves)
+    private void ValidateInput(Map map, List<IMappable> mappables, List<Point> positions, string moves)
     {
-        if (creatures == null || creatures.Count == 0)
+        if (mappables == null || mappables.Count == 0)
         {
-            throw new ArgumentException("List of creatures cannot be empty.");
+            throw new ArgumentException("List of mappables cannot be empty.");
         }
 
-        if (creatures.Count != positions.Count)
+        if (mappables.Count != positions.Count)
         {
-            throw new ArgumentException("Number of creatures must match the number of starting positions.");
+            throw new ArgumentException("Number of mappables must match the number of starting positions.");
         }
 
         if (map == null)
@@ -110,13 +110,13 @@ public class Simulation
     }
 
     /// <summary>
-    /// Initializes creatures by setting their starting positions and adding them to the map.
+    /// Initializes mappables by setting their starting positions and adding them to the map.
     /// </summary>
-    private void InitializeCreatures()
+    private void InitializeIMappables()
     {
-        for (int i = 0; i < Creatures.Count; i++)
+        for (int i = 0; i < IMappables.Count; i++)
         {
-            var creature = Creatures[i];
+            var mappable = IMappables[i];
             var position = Positions[i];
 
             if (!Map.Exist(position))
@@ -124,13 +124,13 @@ public class Simulation
                 throw new ArgumentException($"Position {position} is outside the bounds of the map.");
             }
 
-            creature.InitMapAndPosition(Map, position);
-            Map.Add(creature, position);
+            mappable.InitMapAndPosition(Map, position);
+            Map.Add(mappable, position);
         }
     }
 
     /// <summary>
-    /// Processes the current move for the current creature.
+    /// Processes the current move for the current mappable.
     /// </summary>
     private void ProcessCurrentMove()
     {
@@ -140,7 +140,7 @@ public class Simulation
         if (directions != null && directions.Count > 0)
         {
             var direction = directions[0];
-            CurrentCreature.Go(direction);
+            CurrentIMappable.Go(direction);
         }
     }
 

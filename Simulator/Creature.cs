@@ -1,7 +1,7 @@
 ﻿using Simulator.Maps;
 
 namespace Simulator;
-public abstract class Creature
+public abstract class Creature : IMappable
 {
     public Map? Map { get; private set; }
     public Point Position { get; private set; }
@@ -44,12 +44,14 @@ public abstract class Creature
             return; // Jeśli stwór nie ma mapy, nic nie robimy.
 
         Point nextPosition = Map.Next(Position, direction);
-        Map.Move(this, Position, nextPosition); // Przemieszczanie stworów
+        Map.Move((IMappable)this, Position, nextPosition); // Przemieszczanie stworów
         Position = nextPosition;
     }
 
 
     public abstract string Info { get; }
+    public abstract char Symbol { get; }
+
     public override string ToString() => $"{GetType().Name.ToUpper()}: {Info}";
 
 

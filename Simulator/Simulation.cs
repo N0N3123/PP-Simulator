@@ -1,7 +1,5 @@
 ﻿using Simulator.Maps;
-
 namespace Simulator;
-
 public class Simulation
 {
     /// <summary>
@@ -10,17 +8,21 @@ public class Simulation
     public Map Map { get; }
 
     /// <summary>
-    /// Creatures moving on the map.
+    /// IMappables moving on the map.
     /// </summary>
-    public List<Creature> Creatures { get; }
+    public List<IMappable> IMappables { get; }
 
     /// <summary>
-    /// Starting positions of creatures.
+    /// Starting positions of mappables.
     /// </summary>
     public List<Point> Positions { get; }
 
     /// <summary>
-    /// Cyclic list of creatures' moves.
+    /// Cyclic list of mappables moves. 
+    /// Bad moves are ignored - use DirectionParser.
+    /// First move is for first mappable, second for second and so on.
+    /// When all mappables make moves, 
+    /// next move is again for first mappable and so on.
     /// </summary>
     public string Moves { get; private set; }
 
@@ -32,34 +34,57 @@ public class Simulation
     private int _currentMoveIndex = 0;
 
     /// <summary>
-    /// Creature which will be moving in the current turn.
+    /// IMappable which will be moving current turn.
     /// </summary>
-    public Creature CurrentCreature => Creatures[_currentMoveIndex % Creatures.Count];
+    public IMappable CurrentMappable => IMappables[_currentMoveIndex % IMappables.Count];
 
     /// <summary>
-    /// Lowercase name of the direction which will be used in the current turn.
+    /// Lowercase name of direction which will be used in current turn.
     /// </summary>
     public string CurrentMoveName => Moves[_currentMoveIndex].ToString().ToLower();
 
     /// <summary>
     /// Simulation constructor.
-    /// Validates input and initializes the simulation.
+    /// Throw errors:
+    /// if mappables' list is empty,
+    /// if number of mappables differs from 
+    /// number of starting positions.
     /// </summary>
-    public Simulation(Map map, List<Creature> creatures, List<Point> positions, string moves)
+    public Simulation(Map map, List<IMappable> mappables,
+        List<Point> positions, string moves)
     {
-        ValidateInput(map, creatures, positions, moves);
+        if (mappables == null || mappables.Count == 0)
+        {
+            throw new ArgumentException("List of mappables cannot be empty.");
+        }
 
-        Map = map;
-        Creatures = creatures;
+        if (mappables.Count != positions.Count)
+        {
+            throw new ArgumentException("Number of mappables must match the number of starting positions.");
+        }
+
+        Map = map ?? throw new ArgumentNullException(nameof(map));
+        IMappables = mappables;
         Positions = positions;
-        Moves = moves;
+        Moves = moves ?? throw new ArgumentNullException(nameof(moves));
 
-        InitializeCreatures();
+        for (int i = 0; i < mappables.Count; i++)
+        {
+            var mappable = mappables[i];
+            var position = positions[i];
+
+            if (!map.Exist(position))
+            {
+                throw new ArgumentException($"Position {position} is outside the bounds of the map.");
+            }
+            mappable.InitMapAndPosition(map, position);
+            map.Add(mappable, position);
+
+        }
     }
-
     /// <summary>
-    /// Makes one move of the current creature in the current direction.
-    /// Throws an error if the simulation is finished.
+    /// Makes one move of current mappable in current direction.
+    /// Throw error if simulation is finished.
     /// </summary>
     public void Turn()
     {
@@ -70,93 +95,26 @@ public class Simulation
 
         if (Moves.Length == 0)
         {
-            FinishSimulation();
+            Finished = true;
             return;
         }
 
-        ProcessCurrentMove();
-        AdvanceToNextMove();
-
-        if (_currentMoveIndex >= Moves.Length)
-        {
-            FinishSimulation();
-        }
-    }
-
-    /// <summary>
-    /// Validates the input parameters for the simulation.
-    /// </summary>
-    private void ValidateInput(Map map, List<Creature> creatures, List<Point> positions, string moves)
-    {
-        if (creatures == null || creatures.Count == 0)
-        {
-            throw new ArgumentException("List of creatures cannot be empty.");
-        }
-
-        if (creatures.Count != positions.Count)
-        {
-            throw new ArgumentException("Number of creatures must match the number of starting positions.");
-        }
-
-        if (map == null)
-        {
-            throw new ArgumentNullException(nameof(map));
-        }
-
-        if (string.IsNullOrWhiteSpace(moves))
-        {
-            throw new ArgumentNullException(nameof(moves));
-        }
-    }
-
-    /// <summary>
-    /// Initializes creatures by setting their starting positions and adding them to the map.
-    /// </summary>
-    private void InitializeCreatures()
-    {
-        for (int i = 0; i < Creatures.Count; i++)
-        {
-            var creature = Creatures[i];
-            var position = Positions[i];
-
-            if (!Map.Exist(position))
-            {
-                throw new ArgumentException($"Position {position} is outside the bounds of the map.");
-            }
-
-            creature.InitMapAndPosition(Map, position);
-            Map.Add(creature, position);
-        }
-    }
-
-    /// <summary>
-    /// Processes the current move for the current creature.
-    /// </summary>
-    private void ProcessCurrentMove()
-    {
         char currentMoveChar = Moves[_currentMoveIndex];
         var directions = DirectionParser.Parse(currentMoveChar.ToString());
 
         if (directions != null && directions.Count > 0)
         {
             var direction = directions[0];
-            CurrentCreature.Go(direction);
+            CurrentMappable.Go(direction);
         }
-    }
 
-    /// <summary>
-    /// Advances to the next move and updates the current move index.
-    /// </summary>
-    private void AdvanceToNextMove()
-    {
+        // Advance to the next mappable and move
         _currentMoveIndex++;
-    }
 
-    /// <summary>
-    /// Marks the simulation as finished.
-    /// </summary>
-    private void FinishSimulation()
-    {
-        Finished = true;
+        // Check if all moves are done
+        if (_currentMoveIndex >= Moves.Length)
+        {
+            Finished = true;
+        }
     }
 }

@@ -8,7 +8,7 @@ public abstract class Map
     public int SizeX { get; }
     public int SizeY { get; }
     private Rectangle boundaries;
-    protected abstract List<Creature>?[,] Fields { get; }
+    protected abstract List<IMappable>?[,] Fields { get; }
     /// <summary>
     /// Check if give point belongs to the map.
     /// </summary>
@@ -37,34 +37,34 @@ public abstract class Map
     /// <returns>Next point.</returns>
     public abstract Point NextDiagonal(Point p, Direction d);
 
-    public void Add(Creature creature, Point point)
+    public void Add(IMappable mappable, Point point)
     {
         if (!Exist(point))
             throw new ArgumentException($"Punkt {point} jest poza granicami mapy.");
-        Fields[point.X, point.Y] ??= new List<Creature>();
-        Fields[point.X, point.Y]?.Add(creature);
+        Fields[point.X, point.Y] ??= new List<IMappable>();
+        Fields[point.X, point.Y]?.Add(mappable);
     }
 
-    public void Remove(Creature creature, Point point)
+    public void Remove(IMappable mappable, Point point)
     {
         if (Fields[point.X, point.Y] != null)
         {
-            Fields[point.X, point.Y]?.Remove(creature);
+            Fields[point.X, point.Y]?.Remove(mappable);
             if (Fields[point.X, point.Y]?.Count == 0)
                 Fields[point.X, point.Y] = null;
         }
     }
-    public void Move(Creature creature, Point from, Point to)
+    public void Move(IMappable mappable, Point from, Point to)
     {
-        Remove(creature, from);
-        Add(creature, to);
+        Remove(mappable, from);
+        Add(mappable, to);
     }
 
-    public List<Creature> At(Point point)
+    public List<IMappable> At(Point point)
     {
-        return Fields[point.X, point.Y] ?? new List<Creature>();
+        return Fields[point.X, point.Y] ?? new List<IMappable>();
     }
-    public List<Creature> At(int x, int y)
+    public List<IMappable> At(int x, int y)
     {
         return At(new Point(x, y));
     }

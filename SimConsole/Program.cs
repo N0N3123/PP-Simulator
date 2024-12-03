@@ -9,13 +9,12 @@ class Program
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-        SmallSquareMap map = new(7);
-        List<Creature> creatures = new() { new Orc("DisStream"), new Elf("Legolas") };
-        List<Point> points = new() { new(2, 1), new(1, 2) };
-        string moves = "urrlududrlurd";
+        SmallTorusMap map = new(8, 6);
+        List<IMappable> mappables = new() { new Orc("Gorbag"), new Elf("Elandor"), new Animals("Rabbits", 8), new Birds("Eagle", 14, true), new Birds("Ostrich", 2, false) };
+        List<Point> points = new() { new(2, 2), new(3, 1), new(4, 4), new(2, 5), new(0, 0) };
+        string moves = "dlrludlrrldulru";
 
-
-        Simulation simulation = new(map, creatures, points, moves);
+        Simulation simulation = new(map, mappables, points, moves);
         MapVisualizer mapVisualizer = new(simulation.Map);
 
         while (!simulation.Finished)
@@ -24,9 +23,9 @@ class Program
 
             Console.WriteLine("\nPress any key to make a move...");
             Console.ReadKey(true);
-            Console.Write($"{simulation.CurrentCreature.Info} {simulation.CurrentCreature.Position} goes {simulation.CurrentMoveName}\n");
+            //Console.Write($"{simulation.CurrentMappable.Info} {simulation.CurrentMappable.Position} goes {simulation.CurrentMoveName}\n");
             simulation.Turn();
-
+            Console.Clear();
         }
         mapVisualizer.Draw();
         Console.WriteLine("\nSimulation finished!");

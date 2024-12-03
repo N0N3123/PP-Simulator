@@ -24,13 +24,13 @@ public class Simulation
     /// When all mappables make moves, 
     /// next move is again for first mappable and so on.
     /// </summary>
-    public string Moves { get; private set; }
+    public string Moves { get; }
 
     /// <summary>
     /// Has all moves been done?
     /// </summary>
     public bool Finished { get; private set; } = false;
-
+    private List<Direction> FilteredMoves { get; }
     private int _currentMoveIndex = 0;
 
     /// <summary>
@@ -41,7 +41,7 @@ public class Simulation
     /// <summary>
     /// Lowercase name of direction which will be used in current turn.
     /// </summary>
-    public string CurrentMoveName => Moves[_currentMoveIndex].ToString().ToLower();
+    public string CurrentMoveName => FilteredMoves.Count > _currentMoveIndex ? FilteredMoves[_currentMoveIndex].ToString().ToLower() : string.Empty;
 
     /// <summary>
     /// Simulation constructor.
@@ -50,8 +50,7 @@ public class Simulation
     /// if number of mappables differs from 
     /// number of starting positions.
     /// </summary>
-    public Simulation(Map map, List<IMappable> mappables,
-        List<Point> positions, string moves)
+    public Simulation(Map map, List<IMappable> mappables, List<Point> positions, string moves)
     {
         if (mappables == null || mappables.Count == 0)
         {
@@ -68,6 +67,17 @@ public class Simulation
         Positions = positions;
         Moves = moves ?? throw new ArgumentNullException(nameof(moves));
 
+        FilteredMoves = Moves
+            .Select(c => DirectionParser.Parse(c.ToString().ToLower()))
+            .Where(d => d != null && d.Count > 0)
+            .Select(d => d[0])
+            .ToList();
+
+        if (FilteredMoves.Count == 0)
+        {
+            throw new ArgumentException("Moves must contain at least one valid direction.");
+        }
+
         for (int i = 0; i < mappables.Count; i++)
         {
             var mappable = mappables[i];
@@ -79,7 +89,6 @@ public class Simulation
             }
             mappable.InitMapAndPosition(map, position);
             map.Add(mappable, position);
-
         }
     }
     /// <summary>
@@ -92,29 +101,18 @@ public class Simulation
         {
             throw new InvalidOperationException("The simulation is already finished.");
         }
-
-        if (Moves.Length == 0)
+        if (_currentMoveIndex >= FilteredMoves.Count)
         {
             Finished = true;
             return;
         }
-
-        char currentMoveChar = Moves[_currentMoveIndex];
-        var directions = DirectionParser.Parse(currentMoveChar.ToString());
-
-        if (directions != null && directions.Count > 0)
-        {
-            var direction = directions[0];
-            CurrentMappable.Go(direction);
-        }
-
-        // Advance to the next mappable and move
+        Direction direction = FilteredMoves[_currentMoveIndex];
+        CurrentMappable.Go(direction);
         _currentMoveIndex++;
-
-        // Check if all moves are done
-        if (_currentMoveIndex >= Moves.Length)
+        if (_currentMoveIndex >= FilteredMoves.Count)
         {
             Finished = true;
         }
     }
 }
+

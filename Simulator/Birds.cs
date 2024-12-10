@@ -28,7 +28,7 @@ public class Birds : Animals
             return;
         }
         Point nextPosition = CanFly
-            ? Map.Next(Map.Next(Position, direction), direction)
+            ? Map.Next(Map.Next(Position, direction), direction) // Do poprawy - na bounce map nie działa
             : Map.NextDiagonal(Position, direction);
 
 

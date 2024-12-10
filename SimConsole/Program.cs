@@ -29,7 +29,7 @@ class Program
         }
         mapVisualizer.Draw();
         Console.WriteLine("\nSimulation finished!");
-        foreach (int turn in new[] { 6, 9, 4, 20, 2, 1, 3, 7 })
+        foreach (int turn in new[] {5, 10, 15, 20})
         {
             try
             {

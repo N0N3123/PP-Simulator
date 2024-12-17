@@ -1,19 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-
-namespace SimWeb.Pages;
-
-public class IndexModel : PageModel
+namespace SimWeb.Pages
 {
-    public int Counter { get; private set; }
-    public void OnGet()
+    public class IndexModel : PageModel
     {
-        Counter = HttpContext.Session.GetInt32("Counter") ?? 1;
-    }
-    public void OnPost()
-    {
-        Counter = HttpContext.Session.GetInt32("Counter") ?? 1;
-        Counter++;
-        HttpContext.Session.SetInt32("Counter", Counter);
+        public void OnGet()
+        {
+        }
     }
 }

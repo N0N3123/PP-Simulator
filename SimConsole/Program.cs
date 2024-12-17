@@ -1,47 +1,60 @@
-﻿using Simulator;
-using Simulator.Maps;
+﻿using Simulator.Maps;
+using Simulator;
+using System.Text;
 
-namespace SimConsole;
-
-class Program
+namespace SimConsole
 {
-    static void Main()
+    internal class Program
     {
-        Console.OutputEncoding = System.Text.Encoding.UTF8;
-
-        BigBounceMap map = new(8, 6);
-        List<IMappable> mappables = new() { new Orc("DisStream"), new Elf("Elandor"), new Animals("Rabbits", 8), new Birds("Eagle", 14, true), new Birds("Ostrich", 2, false) };
-        List<Point> points = new() { new(0, 0), new(0, 1), new(0, 2), new(0, 3), new(0, 4) };
-        string moves = "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr";
-
-        Simulation simulation = new(map, mappables, points, moves);
-        SimulationHistory history = new(simulation);
-        MapVisualizer mapVisualizer = new(simulation.Map);
-
-        while (!simulation.Finished)
+        static void Main(string[] args)
         {
-            mapVisualizer.Draw();
-            Console.WriteLine("\nPress any key to make a move...");
-            Console.ReadKey(true);
-            simulation.Turn();
-            history.SaveState();
+            Console.WriteLine("Hello, World!");
+            Console.OutputEncoding = Encoding.UTF8;
+            BigBounceMap map = new(8, 6);
+            List<IMappable> creatures = [new Orc("Gorbag"), new Elf("Elandor"), new Animals("Rabbits", 23), new Birds("Eagles", 8), new Birds("Ostriches", 15, false)];
+            List<Point> points = [new(2, 2), new(3, 1), new(4, 3), new(1, 1), new(0, 4)];
+            string moves = "dlruudlrrldurdlrrrrl";
             Console.Clear();
-        }
-        mapVisualizer.Draw();
-        Console.WriteLine("\nSimulation finished!");
-        foreach (int turn in new[] {5, 10, 15, 20})
-        {
-            try
+
+            /*
+            Simulation simulation = new(map, creatures, points, moves);
+            MapVisualizer mapVisualizer = new(simulation.Map);
+            var current_move = 1;
+            mapVisualizer.Draw();
+            while (simulation.Finished != true)
             {
-                var state = history.GetStateAtTurn(turn);
-                Console.WriteLine($"Turn {turn}:");
-                mapVisualizer.Draw(state);
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey(true);
                 Console.WriteLine();
+                Console.WriteLine($"Turn: {current_move}");
+                //Console.WriteLine($"{simulation.CurrentCreature.Info} {simulation.CurrentCreature.Position} goes {simulation.CurrentMoveName}\n");
+                simulation.Turn();
+                mapVisualizer.Draw();
+                current_move++;
             }
-            catch (ArgumentOutOfRangeException)
-            {
-                Console.WriteLine($"Turn {turn} is out of range.");
-            }
+            */
+            Simulation simulation = new(map, creatures, points, moves);
+            MapVisualizer mapVisualizer = new(simulation.Map);
+            SimulationHistory history = new(simulation);
+            LogVisualizer logVisualizer = new(history);
+            Console.WriteLine("Turn 1: ");
+            logVisualizer.Draw(0);
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey(true);
+            Console.WriteLine();
+            Console.WriteLine("Turn 5: ");
+            logVisualizer.Draw(4);
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey(true);
+            Console.WriteLine();
+            Console.WriteLine("Turn 10: ");
+            logVisualizer.Draw(9);
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey(true);
+            Console.WriteLine();
+            Console.WriteLine("Turn 15: ");
+            logVisualizer.Draw(14);
+            Console.WriteLine("Press any key to continue...");
         }
     }
 }

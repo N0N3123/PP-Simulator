@@ -1,24 +1,31 @@
-﻿<!DOCTYPE html>
+﻿﻿
+<!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Site Name</title>
+    <title>@ViewData["Title"] - Sim Web</title>
     <link rel="stylesheet" href="~/css/site.css"
           asp-append-version="true" />
     <script src="~/js/site.js"></script>
+    <link rel="stylesheet" href="/css/site.css?v=_1W1nOlIxL2kQOMzhWbkiAywQO_qB3VIut42Cr8qI84" />
+    <link rel="stylesheet" href="/css/simulation.css?v=hPjZn2TJ8XXGAQz_XR9k-7gvxZ56dbIsO4IaupSZDdk" />
+
 </head>
 <body>
     <header>
-        <b>Site Name</b>
+        <b>Sim Web</b>
         <nav>
             <a asp-area="" asp-page="/Index">Home</a>
-            <a asp-area="" asp-page="/Privacy">Privacy</a>
+            <a asp-area="" asp-page="/Simulation">Simulation</a>
         </nav>
     </header>
     <main>
         @RenderBody()
     </main>
+    <footer>
+        <p>Bartosz Banach, Uniwersytet Ekonomiczny w Krakowie</p>
+    </footer>
 </body>
 </html>

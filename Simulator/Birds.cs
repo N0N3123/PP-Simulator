@@ -1,39 +1,21 @@
-﻿using Simulator.Maps;
-
-namespace Simulator;
+﻿namespace Simulator;
 
 public class Birds : Animals
 {
     public bool CanFly { get; set; } = true;
-    public override char Symbol => CanFly ? 'B' : 'b';
-    public override string Info
-    {
-        get
-        {
-            string flyAbility = CanFly ? "fly+" : "fly-";
-            return $"{Description} ({flyAbility}) <{Size}>";
-        }
-    }
-    public Birds() { }
-    public Birds(string description = "Unknown Bird", int size = 3, bool canFly = true) : base(description, size)
+    public Birds(string description, uint size, bool canFly = true) : base(description, size)
     {
         CanFly = canFly;
     }
-
+    public override string Info => $"{Description} ({(CanFly ? "fly+" : "fly-")}) <{Size}>";
     public override void Go(Direction direction)
     {
-        if (Map == null)
+        if (Map != null)
         {
-            Console.WriteLine("Map is not set. The bird cannot move.");
-            return;
+            Point nextPosition = CanFly ? Map.Next(Map.Next(Position, direction), direction) : Map.NextDiagonal(Position, direction);
+            Map.Move(this, Position, nextPosition);
+            Position = nextPosition;
         }
-        Point nextPosition = CanFly
-            ? Map.Next(Map.Next(Position, direction), direction) // Do poprawy - na bounce map nie działa
-            : Map.NextDiagonal(Position, direction);
-
-
-        Map.Move(this, Position, nextPosition);
-        Position = nextPosition;
     }
-
+    public override char Symbol => CanFly ? 'B' : 'b';
 }

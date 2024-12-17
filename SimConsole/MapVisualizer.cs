@@ -1,11 +1,11 @@
-﻿using SimConsole;
+﻿using Simulator;
 using Simulator.Maps;
 
-namespace Simulator;
+namespace SimConsole;
 
 public class MapVisualizer
 {
-    private readonly Map _map;
+    public readonly Map _map;
 
     public MapVisualizer(Map map)
     {
@@ -14,30 +14,20 @@ public class MapVisualizer
 
     public void Draw()
     {
-        DrawMap(_map);
-    }
-
-    public void Draw(SimulationState state)
-    {
-        var tempMap = new TempMap(_map.SizeX, _map.SizeY, state.MappableStates);
-        DrawMap(tempMap);
-    }
-
-    private void DrawMap(Map map)
-    {
         Console.Write(Box.TopLeft);
-        for (int x = 0; x < map.SizeX; x++)
+        for (int x = 0; x < _map.SizeX; x++)
         {
             Console.Write(Box.Horizontal);
-            if (x < map.SizeX - 1) Console.Write(Box.TopMid);
+            if (x < _map.SizeX - 1) Console.Write(Box.TopMid);
         }
         Console.WriteLine(Box.TopRight);
-        for (int y = map.SizeY - 1; y >= 0; y--)
+
+        for (int y = _map.SizeY - 1; y >= 0; y--)
         {
             Console.Write(Box.Vertical);
-            for (int x = 0; x < map.SizeX; x++)
+            for (int x = 0; x < _map.SizeX; x++)
             {
-                var creatures = map.At(new Point(x, y));
+                var creatures = _map.At(new Point(x, y));
                 if (creatures.Count > 1)
                 {
                     Console.Write('X');
@@ -51,28 +41,30 @@ public class MapVisualizer
                 {
                     Console.Write(' ');
                 }
-                if (x < map.SizeX - 1)
+                if (x < _map.SizeX - 1)
                 {
                     Console.Write(Box.Vertical);
                 }
             }
             Console.WriteLine(Box.Vertical);
+
             if (y > 0)
             {
                 Console.Write(Box.MidLeft);
-                for (int x = 0; x < map.SizeX; x++)
+                for (int x = 0; x < _map.SizeX; x++)
                 {
                     Console.Write(Box.Horizontal);
-                    if (x < map.SizeX - 1) Console.Write(Box.Cross);
+                    if (x < _map.SizeX - 1) Console.Write(Box.Cross);
                 }
                 Console.WriteLine(Box.MidRight);
             }
         }
+
         Console.Write(Box.BottomLeft);
-        for (int x = 0; x < map.SizeX; x++)
+        for (int x = 0; x < _map.SizeX; x++)
         {
             Console.Write(Box.Horizontal);
-            if (x < map.SizeX - 1) Console.Write(Box.BottomMid);
+            if (x < _map.SizeX - 1) Console.Write(Box.BottomMid);
         }
         Console.WriteLine(Box.BottomRight);
     }

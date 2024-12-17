@@ -1,7 +1,15 @@
 ﻿@page
 @model IndexModel
-<h1>Welcome</h1>
-<h2>Counter: @Model.Counter</h2>
-<form asp-page="/Index" method="post">
-    <button>Count</button>
-</form>
+@{
+    ViewData["Title"] = "Home page";
+}
+<body>
+    <main>
+        <h2>Aplikacja demonstracyjna Sim Web</h2>
+        <p>Wizualizacja symulacji z wykorzystaniem programowania obiektowego w C# i Razor Pages.</p>
+        <br />
+        <p>Mapa typu Small Torus Map.</p>
+        <br />
+        <p>Sekwencja ruchów: <b>lrdulrdurrrluuuddd</b>.</p>
+    </main>
+</body>
